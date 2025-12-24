@@ -11,37 +11,6 @@ class Order extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'user_id',
-        'customer_id',
-        'order_number',
-        'order_name',
-        'discount',
-        'total',
-        'profit',
-        'payment_method',
-        'status',
-    ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'id' => 'integer',
-            'user_id' => 'integer',
-            'customer_id' => 'integer',
-        ];
-    }
-
     public function orderDetails(): HasMany
     {
         return $this->hasMany(OrderDetail::class);
