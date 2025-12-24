@@ -145,6 +145,15 @@ class OrderResource extends Resource
                             $record->each(fn(Order $order) => $order->orderDetails()->delete());
                         })
                 ]),
+            ])
+            ->headerActions([
+                Tables\Actions\ExportAction::make()
+                    ->label('Export Excel')
+                    ->fileDisk('public')
+                    ->color('success')
+                    ->icon('heroicon-o-document-text')
+                    ->exporter(\App\Filament\Exports\OrderExporter::class),
+
             ]);
     }
 
