@@ -98,7 +98,6 @@ class OrderResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('edit-transaction')
                     ->label('Edit Transaction')
                     ->icon('heroicon-o-pencil')
