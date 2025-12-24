@@ -242,4 +242,11 @@ class OrderResource extends Resource
             TextEntry::make('created_at')->dateTime()->formatStateUsing(fn($state) => $state->format('d M Y H:i'))->color('gray'),
         ]);
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            OrderResource\Widgets\OrderStats::class,
+        ];
+    }
 }

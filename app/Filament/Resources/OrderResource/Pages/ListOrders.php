@@ -8,9 +8,11 @@ use App\Models\Order;
 use Filament\Actions;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Pages\Concerns\ExposesTableToWidgets;
 
 class ListOrders extends ListRecords
 {
+    use ExposesTableToWidgets;
     protected static string $resource = OrderResource::class;
 
     protected function getHeaderActions(): array
@@ -39,5 +41,12 @@ class ListOrders extends ListRecords
                     ->badgeColor($data['badgeColor'])
             ];
         })->toArray();
+    }
+
+    public function getHeaderWidgets(): array
+    {
+        return [
+            OrderResource\Widgets\OrderStats::class,
+        ];
     }
 }
