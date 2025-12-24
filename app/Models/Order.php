@@ -31,8 +31,16 @@ class Order extends Model
                     $productProfit = ($detail->price - $detail->product->cost_price) * $detail->quantity;
                     return $carry + $productProfit;
                 }, 0);
+
+                $order->attributes['profit'] = $profitCalculation;
             }
         });
+    }
+
+    public function markAsComplete(): void
+    {
+        $this->status = \App\Enums\OrderStatus::COMPLETED;
+        $this->save();
     }
 
     public function getRouteKeyName(): string

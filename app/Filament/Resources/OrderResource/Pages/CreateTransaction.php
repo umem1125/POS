@@ -78,7 +78,7 @@ class CreateTransaction extends Page implements HasForms
 
     public function finalizeOrder(): void
     {
-        $this->updateOrder;
+        $this->updateOrder();
         $this->record->update([
             'status' => OrderStatus::COMPLETED
         ]);
