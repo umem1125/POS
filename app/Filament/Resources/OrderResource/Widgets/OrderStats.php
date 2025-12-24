@@ -24,7 +24,7 @@ class OrderStats extends BaseWidget
     protected function getStats(): array
     {
         $createdFrom = new Carbon($this->tableFilters['created_at']['created_from']) ?? now()->startOfMonth();
-        $createdTo = new Carbon($this->tableFilters['created_at']['created_from']) ?? now()->endOfMonth();
+        $createdTo = new Carbon($this->tableFilters['created_at']['created_until']) ?? now()->endOfMonth();
 
         $count = Trend::model(Order::class)->between(start: $createdFrom, end: $createdTo)->perDay()->count();
 
@@ -37,6 +37,7 @@ class OrderStats extends BaseWidget
             ->between(start: now()->startOfYear(), end: now()->endOfYear())
             ->perMonth()
             ->sum('total');
+
         return [
             Stat::make('Orders', $this->getPageTableQuery()->count())
                 ->chart($count->map(fn(TrendValue $item) => $item->aggregate)->toArray())
@@ -45,23 +46,27 @@ class OrderStats extends BaseWidget
                 ->descriptionColor('gray')
                 ->color('success'),
 
-            Stat::make('Total', 'Rp ' . number_format(
-                Order::query()
-                    ->where('status', OrderStatus::COMPLETED)
-                    ->when(
-                        $this->tableFilters['created_at']['created_from'] && $this->tableFilters['created_at']['created_until'],
-                        fn($query) => $query->whereDate('created_at', '>=', $createdFrom)->whereDate('created_at', '<=', $createdTo)
-                    )
-                    ->sum('total'),
-                0,
-                ',',
-                '.'
-            ))
+            Stat::make(
+                'Total',
+                'Rp ' . number_format(
+                    Order::query()
+                        ->where('status', OrderStatus::COMPLETED)
+                        ->when(
+                            $this->tableFilters['created_at']['created_from'] && $this->tableFilters['created_at']['created_until'],
+                            fn($query) => $query->whereDate('created_at', '>=', $createdFrom)->whereDate('created_at', '<=', $createdTo)
+                        )
+                        ->sum('total'),
+                    0,
+                    ',',
+                    '.'
+                )
+            )
                 ->chart($total->map(fn(TrendValue $item) => $item->aggregate)->toArray())
                 ->icon('heroicon-o-banknotes')
                 ->description('Profit this month so far.')
                 ->descriptionColor('gray')
                 ->color('success'),
+
             Stat::make(
                 'Profit',
                 'Rp ' . number_format(
