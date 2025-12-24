@@ -62,11 +62,38 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns(
                 self::getTableColumns()
             )
+
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(\App\Enums\OrderStatus::class),
+                Tables\Filters\SelectFilter::make('payment_method')
+                    ->multiple()
+                    ->options(\App\Enums\PaymentMethod::class),
+
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->maxDate(fn(Forms\Get $get) => $get('end_date') ?: now())
+                            ->native(false),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->native(false)
+                            ->maxDate(now()),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
