@@ -10,7 +10,7 @@ enum OrderStatus: string implements HasLabel
     case CANCELLED =  'cancelled';
     case COMPLETED =  'completed';
 
-    public function getLabels(): ?string
+    public function getLabel(): ?string
     {
         return str($this->value)->title();
     }

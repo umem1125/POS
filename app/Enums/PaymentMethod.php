@@ -9,7 +9,7 @@ enum PaymentMethod: string implements HasLabel
     case CASH = 'cash';
     case BANK_TRANSFER = 'bank_transfer';
 
-    public function getLabels(): ?string
+    public function getLabel(): ?string
     {
         return match ($this) {
             self::CASH => 'Cash',

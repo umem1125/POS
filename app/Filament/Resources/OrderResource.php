@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
@@ -23,28 +25,37 @@ class OrderResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
-                Forms\Components\Select::make('customer_id')
-                    ->relationship('customer', 'name'),
-                Forms\Components\TextInput::make('order_number')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('order_name')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('discount')
-                    ->numeric(),
-                Forms\Components\TextInput::make('total')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('profit')
-                    ->numeric(),
-                Forms\Components\TextInput::make('payment_method')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('status')
-                    ->maxLength(255),
+                Forms\Components\Section::make('Order Information')->schema([
+                    Forms\Components\TextInput::make('order_number')
+                        ->required()
+                        ->default(generateSequentialNumber(Order::class))
+                        ->readOnly(),
+                    Forms\Components\TextInput::make('order_name')
+                        ->maxLength(255)
+                        ->placeholder('Create purchase order'),
+                    Forms\Components\TextInput::make('total')
+                        ->readOnlyOn('create')
+                        ->default(0)
+                        ->numeric(),
+                    Forms\Components\Select::make('customer_id')
+                        ->relationship('customer', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->label('Customer (optional)')
+                        ->placeholder('Choose Customer'),
+
+                    Forms\Components\Group::make([
+                        Forms\Components\Select::make('payment_method')
+                            ->enum(PaymentMethod::class)
+                            ->options(PaymentMethod::class)
+                            ->default(PaymentMethod::CASH)
+                            ->required(),
+                        Forms\Components\Select::make('status')
+                            ->enum(OrderStatus::class)
+                            ->options(OrderStatus::class)
+                            ->default(OrderStatus::PENDING),
+                    ])->columnSpan(2)->columns(2),
+                ])->columns(2)
             ]);
     }
 
@@ -110,6 +121,7 @@ class OrderResource extends Resource
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'create-transaction' => Pages\CreateTransaction::route('{record}')
         ];
     }
 }
