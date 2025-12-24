@@ -62,44 +62,18 @@ class OrderResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('customer.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('order_number')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('order_name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('discount')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('total')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('profit')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('payment_method')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ->columns(
+                self::getTableColumns()
+            )
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('edit-transaction')
+                    ->label('Edit Transaction')
+                    ->icon('heroicon-o-pencil')
+                    ->url(fn($record) => "/orders/{$record->order_number}")
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -122,6 +96,58 @@ class OrderResource extends Resource
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
             'create-transaction' => Pages\CreateTransaction::route('{record}')
+        ];
+    }
+
+    public static function getTableColumns(): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('order_number')
+                ->searchable()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('order_name')
+                ->searchable(),
+            Tables\Columns\TextColumn::make('discount')
+                ->numeric()
+                ->sortable(),
+            Tables\Columns\TextColumn::make('total')
+                ->numeric()
+                ->alignEnd()
+                ->sortable()
+                ->summarize(
+                    Tables\Columns\Summarizers\Sum::make('total')
+                        ->money('IDR'),
+                ),
+            Tables\Columns\TextColumn::make('profit')
+                ->numeric()
+                ->alignEnd()
+                ->summarize(
+                    Tables\Columns\Summarizers\Sum::make('profit')
+                        ->money('IDR'),
+                )
+                ->sortable(),
+            Tables\Columns\TextColumn::make('payment_method')
+                ->badge()
+                ->color('gray'),
+            Tables\Columns\TextColumn::make('status')
+                ->badge()
+                ->color(fn($state) => $state->getColor()),
+
+            Tables\Columns\TextColumn::make('user.name')
+                ->numeric()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('customer.name')
+                ->numeric()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('created_at')
+                ->dateTime()
+                ->sortable()
+                ->formatStateUsing(fn($state) => $state->format('d M Y H:i')),
+            Tables\Columns\TextColumn::make('updated_at')
+                ->dateTime()
+                ->sortable()
+                ->formatStateUsing(fn($state) => $state->format('d M Y H:i'))
+                ->toggleable(isToggledHiddenByDefault: true),
         ];
     }
 }
