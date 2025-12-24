@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ProductResource\RelationManagers\StockAdjustmentsRelationManager;
 use App\Filament\Resources\StockAdjustmentResource\Pages;
-use App\Filament\Resources\StockAdjustmentResource\RelationManagers;
 use App\Models\StockAdjustment;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -27,7 +27,8 @@ class StockAdjustmentResource extends Resource
                     ->relationship('product', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->hiddenOn(StockAdjustmentsRelationManager::class),
                 Forms\Components\TextInput::make('quantity_adjusted')
                     ->required()
                     ->numeric(),
@@ -45,7 +46,8 @@ class StockAdjustmentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('product.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->hiddenOn(StockAdjustmentsRelationManager::class),
                 Tables\Columns\TextColumn::make('quantity_adjusted')
                     ->label('Adjusted')
                     ->numeric()
@@ -68,7 +70,8 @@ class StockAdjustmentResource extends Resource
                 Tables\Filters\SelectFilter::make('product_id')
                     ->relationship('product', 'name')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->hiddenOn(StockAdjustmentsRelationManager::class),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

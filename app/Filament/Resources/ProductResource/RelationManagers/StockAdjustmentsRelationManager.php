@@ -16,35 +16,11 @@ class StockAdjustmentsRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('quantity_adjusted')
-                    ->required()
-                    ->maxLength(255),
-            ]);
+        return \App\Filament\Resources\StockAdjustmentResource::form($form);
     }
 
     public function table(Table $table): Table
     {
-        return $table
-            ->recordTitleAttribute('quantity_adjusted')
-            ->columns([
-                Tables\Columns\TextColumn::make('quantity_adjusted'),
-            ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                Tables\Actions\CreateAction::make(),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+        return \App\Filament\Resources\StockAdjustmentResource::table($table);
     }
 }
